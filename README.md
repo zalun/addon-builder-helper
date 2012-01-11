@@ -21,11 +21,11 @@ the Mozilla Add-ons Builder (formerly known as FlightDeck).
 
 ## API ##
 
-<tt>window.mozFlightDeck.**send**(*request*)</tt>
+<tt>var promise = window.mozFlightDeck.**send**(*request*)</tt>
+<tt>promise.**then**(function (*response*) { ... })</tt>
 
 Sends the JSON-able object `request` to the addon and returns a
-response object. For the purposes of this documentation, we will call
-the latter object `response`.
+`response` object through a promise pattern. 
 
 `request` must have at least one property,
 `request.cmd`, which is a string specifying a command to
@@ -52,24 +52,14 @@ Valid command strings are:
   XPI data; due to bug 541828, corrupt values can actually crash
   some versions of Firefox, so be careful!
 
-See `examples/sample-web-page/index.html` for example code that uses
-this API.
 
 ## Limitations ##
 
 Haven't yet made Bugzilla bugs for these.
 
-* It's currently only possible for one addon to be "installed in
-  development mode" at a time. Could be nice in the long-term to
-  allow for multiple ones to be installed.
-
 * The Addon Builder Helper doesn't currently deal well with the case
   where addons raise exceptions while being installed or uninstalled
   in development mode.
-
-* Addons installed in development mode don't stay installed after
-  Firefox restarts. Some think this is a feature, though, not
-  a bug.
 
 * If the user has an addon installed via the Firefox Addon Manager
   and then tries installing the same addon in development mode

@@ -71,7 +71,7 @@ exports.test111Minimal = createTest(
     assert("mozFlightDeck" in unsafeWindow, "`mozFlightDeck` is set");
     let FD = unsafeWindow.mozFlightDeck;
     assertEqual(typeof FD.send, "function", "`mozFlightDeck` has a `send` method");
-    assertEqual(typeof FD.send({}).then, "function", "`send` return an object with `then` method");
+    assertEqual(typeof FD.send("version").then, "function", "`send` return an object with `then` method");
     done();
   },
   function (test, worker, done) {
@@ -81,7 +81,7 @@ exports.test111Minimal = createTest(
 
 exports.testVersion = createTest(
   "new " + function ContentScriptScope() {
-    unsafeWindow.mozFlightDeck.send({cmd: "version"}).then(function (data) {
+    unsafeWindow.mozFlightDeck.send("version").then(function (data) {
       assert(data.success, "'version' succeed");
       self.port.emit("version", data.msg);
     });
@@ -97,7 +97,7 @@ exports.testVersion = createTest(
 
 exports.testIsInstalled = createTest(
   "new " + function ContentScriptScope() {
-    unsafeWindow.mozFlightDeck.send({cmd: "isInstalled"}).then(function (data) {
+    unsafeWindow.mozFlightDeck.send("isInstalled").then(function (data) {
       assert(data.success, "'isInstalled' succeed");
       assert(!data.isInstalled, "'isInstalled' returns false before calling `install`");
       done();
@@ -124,7 +124,7 @@ function readURI(uri) {
 exports.testInstall = createTest(
   "new " + function ContentScriptScope() {
     function assertIsInstalled(value, msg, next) {
-      unsafeWindow.mozFlightDeck.send({cmd: "isInstalled"}).then(function (data) {
+      unsafeWindow.mozFlightDeck.send("isInstalled").then(function (data) {
         assert(data.success, "'isInstalled' succeed");
         assert(data.isInstalled == value, msg);
         next();
@@ -133,7 +133,7 @@ exports.testInstall = createTest(
     self.port.on("xpiData", function (xpiData) {
       assertIsInstalled(false, "'isInstalled' is false before calling `install`", install);
       function install() {
-        unsafeWindow.mozFlightDeck.send({cmd: "install", contents: xpiData}).then(function (data) {
+        unsafeWindow.mozFlightDeck.send("install", xpiData).then(function (data) {
           assert(data.success, "'install' succeed");
           assertEqual(data.msg, "installed", "'install' msg is valid");
           assertIsInstalled(true, "'isInstalled' is true after successfull `install`", uninstall);
@@ -141,7 +141,7 @@ exports.testInstall = createTest(
       }
     });
     function uninstall() {
-      unsafeWindow.mozFlightDeck.send({cmd: "uninstall"}).then(function (data) {
+      unsafeWindow.mozFlightDeck.send("uninstall").then(function (data) {
         assert(data.success, "'uninstall' succeed");
         assertEqual(data.msg, "uninstalled", "'uninstall' msg is valid");
         assertIsInstalled(false, "'isInstalled' is false after calling `uninstall`", end);

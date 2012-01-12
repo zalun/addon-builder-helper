@@ -21,15 +21,13 @@ the Mozilla Add-ons Builder (formerly known as FlightDeck).
 
 ## API ##
 
-<tt>var promise = window.mozFlightDeck.**send**(*request*)</tt>
+<tt>var promise = window.mozFlightDeck.**send**(*command*, ...)</tt>
 <tt>promise.**then**(function (*response*) { ... })</tt>
 
-Sends the JSON-able object `request` to the addon and returns a
+Sends a command request to the addon, with first argument being the command
+name, then optional arguments specific to each command. These arguments
+need to be JSON-able objects. This `send` method returns a
 `response` object through a promise pattern. 
-
-`request` must have at least one property,
-`request.cmd`, which is a string specifying a command to
-send the addon.
 
 `response` has at least one boolean property,
 `response.success`, indicating whether the command executed
@@ -38,19 +36,21 @@ is a string explaining why.
 
 Valid command strings are:
 
-* `isInstalled` - Queries if an addon is currently
-  installed in development mode, placing the boolean result
-  in `response.isInstalled`. `response.installedID` will be
-  the addon's ID.
+* `version` - Queries addon builder helper addon version, placing the
+  integer result in `response.msg`.
 
-* `uninstall` - If an addon is currently installed in development
-  mode, uninstalls it.  If no addon is currently installed, this
-  command does nothing.
+* `toggleConsole` - Toggle visiblity of the XUL JS Console.
 
-* `install` - Installs an addon in development mode, uninstalling
-  any predecessor. `obj.contents` must be a string representing binary
-  XPI data; due to bug 541828, corrupt values can actually crash
-  some versions of Firefox, so be careful!
+* `isInstalled` - Queries if an addon is currently installed,
+  placing the boolean result in `response.isInstalled`.
+
+* `uninstall` - If an addon is currently installed, uninstalls it.
+  If no addon is currently installed, this command does nothing.
+
+* `install` - Installs an addon, uninstalling any predecessor.
+  `obj.contents` must be a string representing binary XPI data;
+  due to bug 541828, corrupt values can actually crash some versions
+  of Firefox, so be careful!
 
 
 ## Limitations ##

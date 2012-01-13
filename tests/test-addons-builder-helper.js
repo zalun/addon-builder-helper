@@ -106,6 +106,32 @@ exports.testIsInstalled = createTest(
   function (test, worker, done) {}
 );
 
+exports.testIsInstalled = createTest(
+  "new " + function ContentScriptScope() {
+    let toggleCount = 1;
+    function toggle(command, result, callback) {
+      unsafeWindow.mozFlightDeck.send("toggleConsole", command).then(function (data) {
+        let n = toggleCount++;
+        assert(data.success, "'toggleConsole' with '" + command + "' succeed [" + n + "]");
+        assertEqual(data.msg, result, "'toggleConsole' returns " + result + " on '" + command + "' [" + n + "]");
+        callback();
+      });
+    }
+    toggle("isOpen", false, function () {
+      toggle("open", null, function () {
+        toggle("isOpen", true, function () {
+          toggle("close", null, function () {
+            toggle("isOpen", false, function () {
+              done();
+            });
+          });
+        });
+      });
+    });
+  },
+  function (test, worker, done) {}
+);
+
 // Utility function that synchronously reads local resource from the given
 // `uri` and returns content string. Read in binary mode.
 const {ByteReader} = require("api-utils/byte-streams");

@@ -123,10 +123,17 @@ function readURI(uri) {
 
 exports.testInstall = createTest(
   "new " + function ContentScriptScope() {
-    function assertIsInstalled(value, msg, next) {
+    function assertIsInstalled(addonId, msg, next) {
       unsafeWindow.mozFlightDeck.send("isInstalled").then(function (data) {
         assert(data.success, "'isInstalled' succeed");
-        assert(data.isInstalled == value, msg);
+        if (addonId) {
+          assert(data.isInstalled, msg);
+          assertEqual(data.installedID, addonId, "`installedID` refer to the correct id");
+        }
+        else {
+          assert(!data.isInstalled, msg);
+          assertEqual(data.installedID, null, "`installedID` is null when isInstalled is false");
+        }
         next();
       });
     }
@@ -136,7 +143,7 @@ exports.testInstall = createTest(
         unsafeWindow.mozFlightDeck.send("install", xpiData).then(function (data) {
           assert(data.success, "'install' succeed");
           assertEqual(data.msg, "installed", "'install' msg is valid");
-          assertIsInstalled(true, "'isInstalled' is true after successfull `install`", uninstall);
+          assertIsInstalled("abh-unit-test@mozilla.com", "'isInstalled' is true after successfull `install`", uninstall);
         });
       }
     });
